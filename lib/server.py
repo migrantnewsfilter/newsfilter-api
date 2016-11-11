@@ -15,11 +15,11 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
 
-# Connect to Mongo
+# Connect to Mongo --> TODO: close connection on shutdown hook!
 client = MongoClient(
     host = os.environ.get('MONGO_HOST') or None
 )
-collection = client['newsfilter'].alerts
+collection = client['newsfilter'].news
 
 # Temporary helper for dealing with some html
 def clean_article(article, key, subkeys):

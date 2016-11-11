@@ -10,6 +10,19 @@ services:
       - .:/newsfilter
     ports:
       - "5000:5000"
+  twitter:
+    build:
+      context: '../twitter'
+    env_file: '../.env'
+    volumes:
+      - ../twitter:/twitter
+  alerts:
+    build:
+      context: '../alerts-rss'
+    environment:
+      MONGO_HOST: mongodb://mongo:27017
+    volumes:
+      - ../alerts-rss:/alerts-rss
   mongo:
     image: mongo:latest
     volumes:
