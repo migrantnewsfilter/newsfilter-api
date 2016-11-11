@@ -1,25 +1,26 @@
 version: '2'
 services:
   newsfilter:
-    build:
-      context: .
+    image: migrantnewsfilter/newsfilter
     environment:
       MONGO_HOST: mongodb://mongo:27017
-      FLASK_DEBUG: 1
-    volumes:
-      - .:/newsfilter
+    fip: 209.177.92.240
+    size: S2
     ports:
-      - "5000:5000"
+      - "80:5000"
+    links:
+      - mongo
   alerts:
-    build:
-      context: '../alerts-rss'
+    image: migrantnewsfilter/alerts-rss
     environment:
       MONGO_HOST: mongodb://mongo:27017
+    size: S2
+    links:
+      - mongo
   mongo:
     image: mongo:latest
+    fip: 209.177.92.45
     volumes:
       - mongo:/data/db
     ports:
-      - "27017:27017"
-volumes:
-  mongo:
+      - "80:27017"
