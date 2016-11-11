@@ -10,6 +10,20 @@ services:
       - "80:5000"
     links:
       - mongo
+  twitter:
+    image: migrantnewsfilter/twitter
+    env_file: .env
+    environment:
+      MONGO_HOST: mongodb://mongo:27017
+    size: S2
+    links:
+      - mongo
+  dumper:
+    image: migrantnewsfilter/dumper
+    entrypoint:
+      - /bin/bash
+      - /scripts/create-cron.sh
+      - mongodb://mongo:27017
   alerts:
     image: migrantnewsfilter/alerts-rss
     environment:

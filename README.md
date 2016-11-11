@@ -23,4 +23,4 @@ docker run --net host migrantnewsfilter/seed-db
 
 At this stage, we are taking full advantage of Mongo's schemaless design and tossing everythign in. As the application develops and solidifies we will use protobuf's to enforce schema changes and keep the UI and content-producing applications in-sync.
 
-Currently the schema of our article content is defined by the producers, so take a look [here](https://github.com/migrantnewsfilter/alerts-rss/blob/master/mongo.py#L6) and [here](https://github.com/migrantnewsfilter/alerts-rss/blob/master/mongo.py#L6).
+Currently the schema of our article content is defined by the producers, so take a look [here](https://github.com/migrantnewsfilter/alerts-rss/blob/master/lib/mongo.py#L6) and [here](https://github.com/migrantnewsfilter/twitter/blob/master/__main__.py#L13).
