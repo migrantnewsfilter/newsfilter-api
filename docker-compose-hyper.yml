@@ -12,17 +12,16 @@ services:
       - mongo
   twitter:
     image: migrantnewsfilter/twitter
-    env_file: .env
-    environment:
-      MONGO_HOST: mongodb://mongo:27017
+    env_file:
+      - ./.env
     size: S2
     links:
       - mongo
   dumper:
     image: migrantnewsfilter/dumper
     entrypoint:
-      - /bin/bash
-      - /scripts/create-cron.sh
+      - "/bin/bash"
+      - "/scripts/create-cron.sh"
       - mongodb://mongo:27017
   alerts:
     image: migrantnewsfilter/alerts-rss
