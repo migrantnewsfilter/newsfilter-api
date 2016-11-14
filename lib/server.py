@@ -21,13 +21,6 @@ client = MongoClient(
 )
 collection = client['newsfilter'].news
 
-# Temporary helper for dealing with some html
-def clean_article(article, key, subkeys):
-    clean = lambda s: BeautifulSoup(s).text
-    return reduce(lambda a,s: assoc_in(a, [key, s], clean(a[key][s])),
-                  subkeys,
-                  article)
-
 @socketio.on('label')
 def handle_label(data):
     collection.update_one({ '_id': data['_id']}, {'$set': {'label': data['label']}})
@@ -35,8 +28,7 @@ def handle_label(data):
 @app.route('/articles')
 def get_articles():
     cursor = collection.find({ 'label': None }, limit=20).sort('added', ASCENDING)
-    l = [ clean_article(a, 'content', ['title', 'body']) for a in list(cursor)]
-    return dumps(l)
+    return dumps(cursor)
 
 def run():
     socketio.run(app, '0.0.0.0')

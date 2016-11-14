@@ -17,12 +17,12 @@ services:
     size: S2
     links:
       - mongo
-  dumper:
-    image: migrantnewsfilter/dumper
-    entrypoint:
-      - "/bin/bash"
-      - "/scripts/create-cron.sh"
-      - mongodb://mongo:27017
+  # dumper:
+  #   image: migrantnewsfilter/dumper
+  #   entrypoint:
+  #     - "/bin/bash"
+  #     - "/scripts/create-cron.sh"
+  #     - mongodb://mongo:27017
   alerts:
     image: migrantnewsfilter/alerts-rss
     environment:
