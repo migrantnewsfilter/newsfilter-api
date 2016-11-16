@@ -14,7 +14,7 @@ services:
     image: migrantnewsfilter/twitter
     env_file:
       - ./.env
-    size: S2
+    size: S4
     links:
       - mongo
   # dumper:
@@ -34,7 +34,7 @@ services:
     image: migrantnewsfilter/oracle
     env_file:
       - ./.env
-    size: S2
+    size: S4
     links:
       - mongo
   mongo:
