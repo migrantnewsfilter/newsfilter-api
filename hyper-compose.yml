@@ -30,6 +30,13 @@ services:
     size: S2
     links:
       - mongo
+  oracle:
+    image: migrantnewsfilter/oracle
+    env_file:
+      - ./.env
+    size: S2
+    links:
+      - mongo
   mongo:
     image: mongo:latest
     fip: 209.177.92.45
