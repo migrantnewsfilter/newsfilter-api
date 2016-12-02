@@ -6,9 +6,11 @@ Flask-Cors==3.0.2
 Flask-SocketIO==2.7.2
 futures==3.0.5
 greenlet==0.4.10
+html2text==2016.9.19
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
+nltk==3.2.1
 pymongo==3.3.1
 python-engineio==1.0.3
 python-socketio==1.6.0

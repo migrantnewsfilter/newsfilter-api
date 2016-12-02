@@ -37,12 +37,17 @@ def get_sources():
 @app.route('/articles/')
 def get_articles():
     collection = client['newsfilter'].news
+    request.args.get('relevance')
     start = int(request.args.get('start')) or 0
-    # Get top 20, sort by prediction, then by date
-    cursor = (collection
-              .find({ 'label': None })
-              .sort([('prediction', -1), ('published', -1)]))
-    return dumps(cursor[start: start+20])
+
+    cursor = collection.aggregate([
+        { '$match': { 'label': None }},
+        { '$sort': { 'prediction': 1, 'published': 1 }},
+        { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
+    ])
+    # get similar
+    l = list(cursor)[start: start+20]
+    return dumps(map(lambda x: x['item'] , l))
 
 def run():
     socketio.run(app, '0.0.0.0')

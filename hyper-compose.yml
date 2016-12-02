@@ -27,7 +27,7 @@ services:
     image: migrantnewsfilter/alerts-rss
     environment:
       MONGO_HOST: mongodb://mongo:27017
-    size: S2
+    size: S4
     links:
       - mongo
   oracle:
