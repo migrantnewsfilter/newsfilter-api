@@ -22,8 +22,8 @@ client = MongoClient(
 )
 
 
-def weeks_ago(weeks):
-    return dt.datetime.utcnow() - dt.timedelta(weeks = weeks)
+def days_ago(days):
+    return dt.datetime.utcnow() - dt.timedelta(days = days)
 
 @socketio.on('label')
 def handle_label(data):
@@ -56,9 +56,10 @@ def get_articles():
     collection = client['newsfilter'].news
     start = int(request.args.get('start')) or 0
     label = request.args.get('label') or None
+    days = int(request.args.get('days')) or 10
 
     cursor = collection.aggregate([
-        { '$match': { 'label': label, 'added': { '$gt': weeks_ago(1) } }},
+        { '$match': { 'label': label, 'added': { '$gt': days_ago(days) } }},
         { '$sort': { 'prediction': 1, 'published': 1 }},
         { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
     ])
