@@ -7,7 +7,7 @@ services:
       MONGO_HOST: mongodb://mongo:27017
       FLASK_DEBUG: 1
     volumes:
-      - .:/newsfilter
+      - .:/usr/src/app
     ports:
       - "5000:5000"
   mongo:

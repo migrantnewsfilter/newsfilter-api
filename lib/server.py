@@ -1,13 +1,14 @@
-from __future__ import print_function # In python 2.7
+from __future__ import print_function
 from flask import Flask, request
 from flask_socketio import SocketIO
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson.json_util import dumps
 from flask_cors import CORS, cross_origin
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from toolz import assoc_in
 import os
 import sys
+import datetime as dt
 
 
 # Make app
@@ -21,10 +22,18 @@ client = MongoClient(
 )
 
 
+def weeks_ago(weeks):
+    return dt.datetime.utcnow() - dt.timedelta(weeks = weeks)
+
 @socketio.on('label')
 def handle_label(data):
     collection = client['newsfilter'].news
-    collection.update_one({ '_id': data['_id']}, {'$set': {'label': data['label']}})
+
+    # update every items within the cluster!!
+    doc = collection.find_one({'_id': data['_id']})
+    cluster = doc.get('cluster')
+    if cluster:
+        collection.update_many({ 'cluster': cluster}, {'$set': {'label': data['label']}})
 
 
 @app.route('/terms')
@@ -33,15 +42,23 @@ def get_sources():
     cursor = collection.find()
     return dumps(cursor)
 
+# Grab cluster of article and get 20 similar articles...
+@app.route('/cluster/<cluster>')
+def get_cluster(cluster):
+    cluster = int(cluster)
+    collection = client['newsfilter'].news
+    cursor = collection.find({'cluster': cluster})
+    return dumps(cursor[0:30])
+
 
 @app.route('/articles/')
 def get_articles():
     collection = client['newsfilter'].news
-    request.args.get('relevance')
     start = int(request.args.get('start')) or 0
+    label = request.args.get('label') or None
 
     cursor = collection.aggregate([
-        { '$match': { 'label': None }},
+        { '$match': { 'label': label, 'added': { '$gt': weeks_ago(1) } }},
         { '$sort': { 'prediction': 1, 'published': 1 }},
         { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
     ])

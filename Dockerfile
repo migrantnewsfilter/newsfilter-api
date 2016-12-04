@@ -4,11 +4,6 @@ FROM python:2-onbuild
 # RUN sudo apt-get update
 # RUN sudo apt-get install certbot -t jessie-backports
 
-ADD . /newsfilter
-RUN pip install -r /newsfilter/requirements.txt
-
 EXPOSE 5000
 
-WORKDIR /newsfilter
-
-CMD [ "python", "__main__.py" ]
+CMD [ "python", "-u", "__main__.py" ]

@@ -34,7 +34,7 @@ services:
     image: migrantnewsfilter/oracle
     env_file:
       - ./.env
-    size: S4
+    size: L2
     links:
       - mongo
   mongo:
