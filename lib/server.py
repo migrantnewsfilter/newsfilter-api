@@ -10,6 +10,12 @@ import os
 import sys
 import datetime as dt
 
+# TODO: cleanup and make propper logging ini config!
+import logging
+logger = logging.getLogger()
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+logger.addHandler(ch)
 
 # Make app
 app = Flask(__name__)
@@ -20,7 +26,6 @@ socketio = SocketIO(app)
 client = MongoClient(
     host = os.environ.get('MONGO_HOST') or None
 )
-
 
 def days_ago(days):
     return dt.datetime.utcnow() - dt.timedelta(days = days)
@@ -36,11 +41,28 @@ def handle_label(data):
         collection.update_many({ 'cluster': cluster}, {'$set': {'label': data['label']}})
 
 
-@app.route('/terms')
+@app.route('/terms', methods = ['GET'])
 def get_sources():
     collection = client['newsfilter'].terms
     cursor = collection.find()
     return dumps(cursor)
+
+@app.route('/terms', methods = ['POST'])
+def add_source():
+    data = request.json
+    collection = client['newsfilter'].terms
+    if data.get('feed'):
+        collection.update_one({'_id': data['source']},
+                              { '$addToSet': {'feeds': data['feed']}})
+        return "term added"
+    else:
+        return "ummmm..." # TODO!!!!
+
+@app.route('/terms/<source>/<path:term_id>', methods = ['DELETE'])
+def delete_source(source, term_id):
+    collection = client['newsfilter'].terms
+    collection.update_one({'_id': source}, { '$pull': { 'feeds': term_id}})
+    return "term removed"
 
 # Grab cluster of article and get 20 similar articles...
 @app.route('/cluster/<cluster>')
@@ -54,6 +76,7 @@ def get_cluster(cluster):
 @app.route('/articles/')
 def get_articles():
     collection = client['newsfilter'].news
+
     start = int(request.args.get('start')) or 0
     label = request.args.get('label') or None
     days = int(request.args.get('days')) or 10
