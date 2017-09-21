@@ -92,7 +92,7 @@ def get_articles():
         sort = SON([ ('published', 1), ('prediction', 1)])
 
     cursor = collection.aggregate([
-        { '$match': { 'label': label, 'added': { '$gt': days_ago(days) } }},
+        { '$match': { 'label': label, 'published': { '$gt': days_ago(days) } }},
         { '$sort': sort },
         { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
     ])
