@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_socketio import SocketIO
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson.json_util import dumps
+from bson.son import SON
 from flask_cors import CORS, cross_origin
 from bs4 import BeautifulSoup
 from toolz import assoc_in
@@ -75,19 +76,29 @@ def get_cluster(cluster):
 
 @app.route('/articles/')
 def get_articles():
-    collection = client['newsfilter'].news
 
+    collection = client['newsfilter'].news
     start = int(request.args.get('start')) or 0
-    label = request.args.get('label') or None
+
+    label = request.args.get('label')
+    label = None if label == 'unlabelled' else label
+
     days = int(request.args.get('days')) or 10
+    relevance = request.args.get('relevance') or 'true'
+
+    if relevance == 'true':
+        sort = SON([ ('prediction', 1), ('published', 1)])
+    else:
+        sort = SON([ ('published', 1), ('prediction', 1)])
 
     cursor = collection.aggregate([
         { '$match': { 'label': label, 'added': { '$gt': days_ago(days) } }},
-        { '$sort': { 'prediction': 1, 'published': 1 }},
+        { '$sort': sort },
         { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
     ])
-    # get similar
-    l = list(cursor)[start: start+20]
+
+    # return entire list...
+    l = list(cursor)[0: start+20]
     return dumps(map(lambda x: x['item'] , l))
 
 def run():
