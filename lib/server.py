@@ -87,8 +87,8 @@ def get_articles():
 
     cursor = collection.aggregate([
         { '$match': { 'label': label, 'published': { '$gt': days_ago(days) } }},
-        { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}},
         { '$sort': sort },
+        { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
     ])
 
     # return entire list...
