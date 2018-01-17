@@ -10,13 +10,7 @@ from toolz import assoc_in
 import os
 import sys
 import datetime as dt
-
-# TODO: cleanup and make propper logging ini config!
 import logging
-logger = logging.getLogger()
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-logger.addHandler(ch)
 
 # Make app
 app = Flask(__name__)
@@ -24,6 +18,7 @@ CORS(app)
 socketio = SocketIO(app)
 
 # Connect to Mongo --> TODO: close connection on shutdown hook!
+
 client = MongoClient(
     host = os.environ.get('MONGO_HOST') or None
 )
@@ -68,7 +63,6 @@ def delete_source(source, term_id):
 # Grab cluster of article and get 20 similar articles...
 @app.route('/cluster/<cluster>')
 def get_cluster(cluster):
-    cluster = int(cluster)
     collection = client['newsfilter'].news
     cursor = collection.find({'cluster': cluster})
     return dumps(cursor[0:30])
@@ -93,8 +87,8 @@ def get_articles():
 
     cursor = collection.aggregate([
         { '$match': { 'label': label, 'published': { '$gt': days_ago(days) } }},
+        { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}},
         { '$sort': sort },
-        { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
     ])
 
     # return entire list...
