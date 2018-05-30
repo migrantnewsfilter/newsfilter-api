@@ -89,7 +89,7 @@ def get_articles():
         { '$match': { 'label': label, 'published': { '$gt': days_ago(days) } }},
         { '$sort': sort },
         { '$group': { '_id': '$cluster', 'item': { '$first': '$$ROOT' }}}
-    ])
+    ], allowDiskUse = True)
 
     # return entire list...
     l = list(cursor)[0: start+20]
